@@ -8,26 +8,40 @@ public class HttpRequest : MonoBehaviour
 {
     protected static string appToken = "test";
 
-    protected static string BASE_URL = "http://eip-api.kokakiwi.net:80/";
+    protected static string BASE_URL = "http://eip-api.kokakiwi.net/";
+    protected static string DEV_URL = "http://eip-api-dev.kokakiwi.net/";
     protected static string API_VERSION = "v1";
-    protected static string BASE_END_POINT = BASE_URL + API_VERSION;
+    protected static string BASE_END_POINT = DEV_URL + API_VERSION;
 
-    protected static string AUTHORIZATION = "?Authorization=";
-
-    public static string sessionToken = null;
+    UserData userData = null;
+    void Start()
+    {
+        userData = gameObject.GetComponent<UserData>();
+    }
 
     /*
     **  WWW
     */
     protected void Request(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error,
-        string url, WWWForm form = null)
+        string url, bool useToken = false, string data = null)
     {
-        if (form == null)
-            form = new WWWForm();
-        form.headers["Content-Type"] = "application/json";
-        form.headers["Accept"] = "application/json";
+        var headers = new System.Collections.Generic.Dictionary<string, string>();
+        headers.Add("Content-Type", "application/json");
+        headers.Add("Accept", "application/json");
+        if (useToken)
+        {
+            headers.Add("X-User-Email", userData.email);
+            headers.Add("Authorization", "Bearer " + userData.token);
+        }
 
-        WWW www = new WWW(url, form);
+        WWW www;
+        if (data != null)
+        {
+            byte[] postData = System.Text.Encoding.UTF8.GetBytes(data);
+            www = new WWW(url, postData, headers);
+        }
+        else
+            www = new WWW(url, null, headers);
         StartCoroutine(WaitForRequest(c_Success, c_Error, www));
     }
 
@@ -44,6 +58,7 @@ public class HttpRequest : MonoBehaviour
         }
         else
         {
+            Debug.LogWarning(www.url);
             c_Error(www);
         }
     }
@@ -54,7 +69,7 @@ public class HttpRequest : MonoBehaviour
     protected static string USER_LOGIN = "/users/auth/login/simple";
     protected static string USER_LOGOUT = "/users/auth/logout";
     protected static string USER_REGISTER = "/users/auth/register";
-    protected static string USER_RESET_PASSWORD = "/users/auth/register";
+    protected static string USER_RESET_PASSWORD = "/users/auth/resetpassword";
 
 
     public void PostLogIn(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error,
@@ -62,21 +77,22 @@ public class HttpRequest : MonoBehaviour
     {
         string url = BASE_END_POINT + USER_LOGIN;
 
-        WWWForm form = new WWWForm();
-        form.AddField("app_token", appToken);
-        form.AddField("email", email);
-        form.AddField("password", password);
-        form.AddField("data", data);
+        var json = "{ \"email\": \"{email}\", \"app_token\": \"{app_token}\", \"password\": \"{password}\", \"data\": \"{data}\" }";
+        json = json
+            .Replace("{email}", email)
+            .Replace("{app_token}", appToken)
+            .Replace("{password}", password)
+            .Replace("{data}", data);
 
-        Request(c_Success, c_Error, url, form);
+        Request(c_Success, c_Error, url, false, json);
     }
 
-    public void GetLogOut(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error,
-        string sessionToken)
+    public void PostLogOut(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
     {
-        string url = BASE_END_POINT + USER_LOGOUT + AUTHORIZATION + sessionToken;
+        string url = BASE_END_POINT + USER_LOGOUT;
 
-        Request(c_Success, c_Error, url);
+        var json = "{}";
+        Request(c_Success, c_Error, url, true, json);
     }
 
     public void PostRegister(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error,
@@ -84,12 +100,13 @@ public class HttpRequest : MonoBehaviour
     {
         string url = BASE_END_POINT + USER_REGISTER;
 
-        WWWForm form = new WWWForm();
-        form.AddField("pseudo", pseudo);
-        form.AddField("email", email);
-        form.AddField("password", password);
+        var json = "{\"pseudo\":\"{pseudo}\",\"email\":\"{email}\",\"password\":\"{password}\"}";
+        json = json
+            .Replace("{pseudo}", pseudo)
+            .Replace("{email}", email)
+            .Replace("{password}", password);
 
-        Request(c_Success, c_Error, url, form);
+        Request(c_Success, c_Error, url, false, json);
     }
 
     public void PostResetPassword(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error,
@@ -97,33 +114,95 @@ public class HttpRequest : MonoBehaviour
     {
         string url = BASE_END_POINT + USER_REGISTER;
 
-        WWWForm form = new WWWForm();
-        form.AddField("email", email);
+        var json = "{\"email\":\"{email}\"}";
+        json = json.Replace("{email}", email);
 
-        Request(c_Success, c_Error, url, form);
+        Request(c_Success, c_Error, url, false, json);
     }
 
     /*
     **  Users
     */
     protected static string USERS = "/users/";
+    protected static string USERSFRIENDS = "/users/friends/";
+    protected static string USERSMONSTERS = "/users/monsters/";
+    protected static string USERSINVENTORY = "/users/inventory/";
 
-    public void GetUser(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error,
-        string sessionToken)
+    public void GetUser(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
     {
-        string url = BASE_END_POINT + USERS + AUTHORIZATION + sessionToken;
+        string url = BASE_END_POINT + USERS;
 
-        Request(c_Success, c_Error, url);
+        Request(c_Success, c_Error, url, true);
+    }
+
+    public void GetUserFriends(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
+    {
+        string url = BASE_END_POINT + USERSFRIENDS;
+
+        Request(c_Success, c_Error, url, true);
+    }
+
+    public void GetUserMonsters(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
+    {
+        string url = BASE_END_POINT + USERSMONSTERS;
+
+        Request(c_Success, c_Error, url, true);
+    }
+
+    public void GetUserInventory(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
+    {
+        string url = BASE_END_POINT + USERSINVENTORY;
+
+        Request(c_Success, c_Error, url, true);
     }
 
     /*
     **  Monsters
     */
     protected static string MONSTERS = "/monsters/";
+    protected static string MONSTERID = "/monsters/{monster_id}";
+    protected static string MONSTERIDATTACKS = "/monsters/{monster_id}/attacks";
 
     public void GetMonsters(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
     {
         string url = BASE_END_POINT + MONSTERS;
+
+        Request(c_Success, c_Error, url);
+    }
+
+    public void GetMonsterId(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error, int monsterId)
+    {
+        string url = BASE_END_POINT + MONSTERID;
+        url.Replace("{monster_id}", monsterId.ToString());
+
+        Request(c_Success, c_Error, url);
+    }
+
+    public void GetMonsterIdAttacks(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error, int monsterId)
+    {
+        string url = BASE_END_POINT + MONSTERIDATTACKS;
+        url.Replace("{monster_id}", monsterId.ToString());
+
+        Request(c_Success, c_Error, url);
+    }
+
+    /*
+    **  Default
+    */
+
+    protected static string OBJECTS = "/objects/";
+    protected static string ATTACKS = "/attacks/";
+
+    public void GetObjects(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
+    {
+        string url = BASE_END_POINT + OBJECTS;
+
+        Request(c_Success, c_Error, url);
+    }
+
+    public void GetAttacks(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error)
+    {
+        string url = BASE_END_POINT + ATTACKS;
 
         Request(c_Success, c_Error, url);
     }
