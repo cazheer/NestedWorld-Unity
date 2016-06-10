@@ -51,7 +51,7 @@ public class HttpRequest : MonoBehaviour
 
         if (www.error == null)
         {
-            Debug.LogWarning(www.text);
+            Debug.Log(www.text);
             JSONNode node = JSON.Parse(www.text);
             if (!c_Success(node))
                 Debug.LogWarning("[NETWORK] callback return false");
