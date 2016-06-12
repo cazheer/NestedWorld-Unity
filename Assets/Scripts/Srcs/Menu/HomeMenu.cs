@@ -12,7 +12,7 @@ public class HomeMenu : MonoBehaviour
         DontDestroyOnLoad(gameObject.transform.parent.gameObject);
     }
 
-	void Start ()
+	void Start()
     {
         MaterialUI.ToastControl.InitToastSystem(GetComponent<Canvas>());
 

@@ -19,9 +19,6 @@ public class OptionMenu : MonoBehaviour
         menuContainer = GameObject.FindGameObjectWithTag("MenuContainer");
         transform.SetParent(menuContainer.transform);
 
-        // sound
-        currentSoundVolume = slider.value;
-
         // Resolution
         List<string> listOption = new List<string>();
         Resolution[] resolutions = Screen.resolutions;
@@ -36,8 +33,14 @@ public class OptionMenu : MonoBehaviour
                 resPosition = i;
             i++;
         }
-        resolutionDrop.value = currentResolution = resPosition;
+        resolutionDrop.value = resPosition;
         resolutionDrop.AddOptions(listOption);
+    }
+
+    void OnEnable()
+    {
+        currentSoundVolume = slider.value;
+        currentResolution = resolutionDrop.value;
     }
 
     public void Save()

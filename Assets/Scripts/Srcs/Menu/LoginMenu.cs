@@ -13,8 +13,10 @@ public class LoginMenu : MonoBehaviour
     [SerializeField]
     Toggle keepConnected;
 
+    ServerListener server;
     HttpRequest request;
     UserData userData;
+    bool canRetry = true;
 
     // Use this for initialization
     void Start()
@@ -24,6 +26,7 @@ public class LoginMenu : MonoBehaviour
         GameObject requester = GameObject.FindGameObjectWithTag("Requester");
         userData = requester.GetComponent<UserData>();
         request = requester.GetComponent<HttpRequest>();
+        server = requester.GetComponent<ServerListener>();
 
         // get the email from previous data
         if (PlayerPrefs.HasKey(Constants.emailCache))
@@ -36,6 +39,9 @@ public class LoginMenu : MonoBehaviour
 
     public void Connexion()
     {
+        if (!canRetry)
+            return;
+
         if (email.text.Length == 0)
             MaterialUI.ToastControl.MakeToast("Vous devez rentrer votre email", 5.0f, Color.white, Color.black, 32);
         else if (password.text.Length == 0)
@@ -43,6 +49,7 @@ public class LoginMenu : MonoBehaviour
         else
         {
             userData.email = email.text;
+            canRetry = false;
             request.PostLogIn(ConnexionOnSuccess, ConnexionOnFailure, email.text, password.text);
         }
     }
@@ -64,6 +71,7 @@ public class LoginMenu : MonoBehaviour
             return false;
         }
         userData.token = sessionToken;
+        server.StartConnexion();
         SceneManager.LoadScene("HomeScene");
         return true;
     }
@@ -82,6 +90,7 @@ public class LoginMenu : MonoBehaviour
             }
         }
         MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        canRetry = true;
         return true;
     }
 

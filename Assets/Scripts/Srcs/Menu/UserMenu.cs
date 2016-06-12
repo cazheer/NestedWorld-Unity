@@ -24,11 +24,22 @@ public class UserMenu : MonoBehaviour
 
         userData = GameObject.FindGameObjectWithTag("Requester").GetComponent<UserData>();
 
-        UpdateMonsterList();
+        UpdateUser();
     }
 
     void OnEnable()
     {
+        if (userData != null)
+            UpdateUser();
+    }
+
+    void UpdateUser()
+    {
+        // update user data
+        charaName.text = userData.user.pseudo;
+        email.text = userData.email;
+
+        // launch update list
         UpdateMonsterList();
     }
 
@@ -44,7 +55,7 @@ public class UserMenu : MonoBehaviour
         }
     }
 
-    void Return()
+    public void Return()
     {
         Transform home = menuContainer.transform.FindChild("HomeMenu");
         home.gameObject.SetActive(true);
