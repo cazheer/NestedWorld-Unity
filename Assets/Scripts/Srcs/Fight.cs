@@ -22,9 +22,6 @@ public class Fight : MonoBehaviour
     public int currentUserMonsterHp = 100;
     public int currentEnemyMonsterHp = 100;
 
-    private float currentTime = 0f;
-    private float MaxTime = 0.2f;
-
     void Start()
     {
         userMonster.hp = 100;
@@ -33,28 +30,25 @@ public class Fight : MonoBehaviour
 
     void Update()
     {
-        currentTime += Time.deltaTime;
-        if (currentTime < MaxTime)
-            return;
+        var valueNeeded = attackQTE[cursor].GetComponent<ButtonValueQTE>().value;
 
-        int angle = (int)attackQTE[cursor].transform.rotation.z;
+        bool left = Input.GetKeyDown(KeyCode.LeftArrow);
+        bool right = Input.GetKeyDown(KeyCode.RightArrow);
+        bool up = Input.GetKeyDown(KeyCode.UpArrow);
+        bool down = Input.GetKeyDown(KeyCode.DownArrow);
 
-        float x = Input.GetAxisRaw("Horizontal");
-        float y = Input.GetAxisRaw("Vertical");
-
-        if ((angle == 0 && x < 0f && y == 0f) ||
-            (angle == 90 && x == 0f && y < 0f) ||
-            (angle == 180 && x > 0f && y == 0f) ||
-            ((angle + 360) % 360 == 270 && x == 0f && y > 0f))
+        if ((valueNeeded == ButtonValueQTE.ButtonValue.LEFT && left && !right && !up && !down) ||
+            (valueNeeded == ButtonValueQTE.ButtonValue.DOWN && !left && !right && !up && down) ||
+            (valueNeeded == ButtonValueQTE.ButtonValue.RIGHT && !left && right && !up && !down) ||
+            (valueNeeded == ButtonValueQTE.ButtonValue.UP && !left && !right && up && !down))
             Success();
-        else if (x != 0f || y != 0f)
+        else if (left || right || up || down)
             Failure();
 
-        if (x != 0f || y != 0f)
-            currentTime = 0f;
-
-        if (cursor == attackQTE.Length)
+        if (attackQTE.Length == cursor)
+        {
             Attack();
+        }
     }
 
     void Success()
@@ -88,6 +82,6 @@ public class Fight : MonoBehaviour
     void DecreaseEnemyEnemyLife(int dmg)
     {
         currentEnemyMonsterHp -= dmg;
-        enemyHp.fillAmount = currentEnemyMonsterHp / enemyMonster.hp;
+        enemyHp.fillAmount = (float)currentEnemyMonsterHp / enemyMonster.hp;
     }
 }

@@ -6,13 +6,6 @@ using SimpleJSON;
 
 public class HttpRequest : MonoBehaviour
 {
-    protected static string appToken = "test";
-
-    protected static string BASE_URL = "http://eip-api.kokakiwi.net/";
-    protected static string DEV_URL = "http://eip-api-dev.kokakiwi.net/";
-    protected static string API_VERSION = "v1";
-    protected static string BASE_END_POINT = DEV_URL + API_VERSION;
-
     UserData userData = null;
     void Start()
     {
@@ -63,6 +56,13 @@ public class HttpRequest : MonoBehaviour
         }
     }
 
+    protected static string appToken = "test";
+
+    protected static string BASE_URL = "http://eip-api.kokakiwi.net/";
+    protected static string DEV_URL = "http://eip-api-dev.kokakiwi.net/";
+    protected static string API_VERSION = "v1";
+    protected static string BASE_END_POINT = DEV_URL + API_VERSION;
+
     /* 
     **  Auth
     */
@@ -70,7 +70,6 @@ public class HttpRequest : MonoBehaviour
     protected static string USER_LOGOUT = "/users/auth/logout";
     protected static string USER_REGISTER = "/users/auth/register";
     protected static string USER_RESET_PASSWORD = "/users/auth/resetpassword";
-
 
     public void PostLogIn(Func<JSONNode, bool> c_Success, Func<WWW, bool> c_Error,
         string email, string password, string data = "")
