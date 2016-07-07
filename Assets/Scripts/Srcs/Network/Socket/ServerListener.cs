@@ -1,27 +1,84 @@
 ﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.Networking;
+using System;
+using System.IO;
+using System.Net.Sockets;
+using MessagePack.Serveur;
+using MessagePack.Client;
 
 public class ServerListener : MonoBehaviour
 {
-    private static int TIME_OUT = 10000;
-    private static string HOST = "eip.kokakiwi.net";
-    private static int PORT = 6464;
-
     [HideInInspector]
-    public bool isStarted = false;
-    private NetworkClient network = new NetworkClient();
+    public bool socketReady = false;
+    TcpClient mySocket = null;
+    NetworkStream theStream = null;
+    StreamWriter theWriter = null;
+    StreamReader theReader = null;
+    String Host = "eip.kokakiwi.net";
+    Int32 Port = 6464;
 
-    public void StartConnexion()
+    UserData userData;
+
+    public ServeurMessageList serverMsg = new ServeurMessageList();
+    public ClientMessageList clientMsg = new ClientMessageList();
+
+    void Start()
     {
-        isStarted = true;
-
-        network.RegisterHandler(MsgType.Connect, OnConnected);
-        network.Connect(HOST, PORT);
+        userData = gameObject.GetComponent<UserData>();
     }
 
-    void OnConnected(NetworkMessage netMsg)
+    void Update()
     {
-        Debug.Log("Connected to server");
+        if (socketReady)
+            serverMsg.SelectMessage(Read());
+    }
+
+    public void setupSocket()
+    {
+        try
+        {
+            mySocket = new TcpClient(Host, Port);
+            theStream = mySocket.GetStream();
+            theWriter = new StreamWriter(theStream);
+            theReader = new StreamReader(theStream);
+            socketReady = true;
+
+            serverMsg.Init();
+            var request = MessagePack.Client.Special.Authenticate.GetAuthenticate(userData.token);
+            clientMsg.SendRequest(request);
+        }
+        catch (Exception e)
+        {
+            Logger.Instance.Log("Socket error: " + e);
+        }
+    }
+
+    public void Send(Stream stream)
+    {
+        if (!socketReady)
+            return;
+        StreamReader reader = new StreamReader(stream);
+        string text = reader.ReadToEnd();
+        theWriter.Write(text);
+        theWriter.Flush();
+    }
+
+    public byte[] Read()
+    {
+        if (!socketReady)
+            return null;
+        if (theStream.DataAvailable)
+            return System.Text.Encoding.UTF8.GetBytes(theReader.ReadToEnd());
+        return System.Text.Encoding.UTF8.GetBytes("");
+    }
+
+    public void closeSocket()
+    {
+        if (theWriter != null)
+            theWriter.Close();
+        if (theReader != null)
+            theReader.Close();
+        if (mySocket != null)
+            mySocket.Close();
+        socketReady = false;
     }
 }

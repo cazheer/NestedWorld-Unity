@@ -16,6 +16,8 @@ public class OptionMenu : MonoBehaviour
 
 	void Start ()
     {
+        Logger.Instance.Init(GetComponent<Canvas>());
+
         menuContainer = GameObject.FindGameObjectWithTag("MenuContainer");
         transform.SetParent(menuContainer.transform);
 
@@ -39,6 +41,7 @@ public class OptionMenu : MonoBehaviour
 
     void OnEnable()
     {
+        Logger.Instance.Init(GetComponent<Canvas>());
         currentSoundVolume = slider.value;
         currentResolution = resolutionDrop.value;
     }

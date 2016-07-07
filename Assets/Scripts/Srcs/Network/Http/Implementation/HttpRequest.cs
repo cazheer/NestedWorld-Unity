@@ -52,6 +52,8 @@ public class HttpRequest : MonoBehaviour
         else
         {
             Debug.LogWarning(www.url);
+            Debug.LogWarning(www.error);
+            Debug.LogWarning(www.text);
             c_Error(www);
         }
     }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using SimpleJSON;
@@ -21,7 +20,7 @@ public class LoginMenu : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        MaterialUI.ToastControl.InitToastSystem(GetComponent<Canvas>());
+        Logger.Instance.Init(GetComponent<Canvas>());
 
         GameObject requester = GameObject.FindGameObjectWithTag("Requester");
         userData = requester.GetComponent<UserData>();
@@ -43,9 +42,9 @@ public class LoginMenu : MonoBehaviour
             return;
 
         if (email.text.Length == 0)
-            MaterialUI.ToastControl.MakeToast("Vous devez rentrer votre email", 5.0f, Color.white, Color.black, 32);
+            Logger.Instance.Log("Vous devez rentrer votre email");
         else if (password.text.Length == 0)
-            MaterialUI.ToastControl.MakeToast("Vous devez rentrer votre mot de passe", 5.0f, Color.white, Color.black, 32);
+            Logger.Instance.Log("Vous devez rentrer votre mot de passe");
         else
         {
             userData.email = email.text;
@@ -63,6 +62,8 @@ public class LoginMenu : MonoBehaviour
             PlayerPrefs.SetString(Constants.passwordCache, password.text);
             PlayerPrefs.Save();
         }
+        
+        server.setupSocket();
 
         string sessionToken = node["token"].Value;
         if (sessionToken == null)
@@ -71,7 +72,6 @@ public class LoginMenu : MonoBehaviour
             return false;
         }
         userData.token = sessionToken;
-        server.StartConnexion();
         SceneManager.LoadScene("HomeScene");
         return true;
     }
@@ -89,7 +89,7 @@ public class LoginMenu : MonoBehaviour
                 errorText = node["message"].Value;
             }
         }
-        MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log(errorText);
         canRetry = true;
         return true;
     }
@@ -99,12 +99,12 @@ public class LoginMenu : MonoBehaviour
         if (email.text.Length != 0)
             request.PostResetPassword(PasswordForgotOnSuccess, PasswordForgotOnFailure, email.text);
         else
-            MaterialUI.ToastControl.MakeToast("Vous devez rentrer votre email", 5.0f, Color.white, Color.black, 32);
+            Logger.Instance.Log("Vous devez rentrer votre email");
     }
 
     private bool PasswordForgotOnSuccess(JSONNode node)
     {
-        MaterialUI.ToastControl.MakeToast("Votre demande de réinitialisation a bien été prise en compte. Vous devriez recevoir un e-mail sous peu.", 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log("Votre demande de réinitialisation a bien été prise en compte. Vous devriez recevoir un e-mail sous peu.");
         return true;
     }
 
@@ -122,7 +122,7 @@ public class LoginMenu : MonoBehaviour
                 errorText = node["message"].Value;
             }
         }
-        MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log(errorText);
         return true;
     }
 }

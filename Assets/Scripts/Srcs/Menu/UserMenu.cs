@@ -19,6 +19,8 @@ public class UserMenu : MonoBehaviour
 
     void Start()
     {
+        Logger.Instance.Init(GetComponent<Canvas>());
+
         menuContainer = GameObject.FindGameObjectWithTag("MenuContainer");
         transform.SetParent(menuContainer.transform);
 
@@ -29,6 +31,8 @@ public class UserMenu : MonoBehaviour
 
     void OnEnable()
     {
+        Logger.Instance.Init(GetComponent<Canvas>());
+
         if (userData != null)
             UpdateUser();
     }

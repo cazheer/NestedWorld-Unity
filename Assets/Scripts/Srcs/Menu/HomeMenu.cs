@@ -14,7 +14,7 @@ public class HomeMenu : MonoBehaviour
 
 	void Start()
     {
-        MaterialUI.ToastControl.InitToastSystem(GetComponent<Canvas>());
+        Logger.Instance.Init(GetComponent<Canvas>());
 
         GameObject requester = GameObject.FindGameObjectWithTag("Requester");
         userData = requester.GetComponent<UserData>();
@@ -22,6 +22,11 @@ public class HomeMenu : MonoBehaviour
 
         UpdateUserInfo();
 	}
+
+    void OnEnable()
+    {
+        Logger.Instance.Init(GetComponent<Canvas>());
+    }
 
     public void UpdateUserInfo()
     {
@@ -34,8 +39,7 @@ public class HomeMenu : MonoBehaviour
 
     public void SeekOpponent()
     {
-        SceneManager.LoadScene("GameScene");
-        gameObject.SetActive(false);
+        // TODO "combat:ask"
     }
 
     public void User()
@@ -94,7 +98,7 @@ public class HomeMenu : MonoBehaviour
                 errorText = node["message"].Value;
             }
         }
-        MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log(errorText);
         return true;
     }
 
@@ -132,7 +136,7 @@ public class HomeMenu : MonoBehaviour
                 errorText = node["message"].Value;
             }
         }
-        MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log(errorText);
         return true;
     }
 
@@ -170,7 +174,7 @@ public class HomeMenu : MonoBehaviour
                 errorText = node["message"].Value;
             }
         }
-        MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log(errorText);
         return true;
     }
 
@@ -208,7 +212,7 @@ public class HomeMenu : MonoBehaviour
                 errorText = node["message"].Value;
             }
         }
-        MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log(errorText);
         return true;
     }
 
@@ -241,7 +245,7 @@ public class HomeMenu : MonoBehaviour
                 errorText = node["message"].Value;
             }
         }
-        MaterialUI.ToastControl.MakeToast(errorText, 5.0f, Color.white, Color.black, 32);
+        Logger.Instance.Log(errorText);
         return true;
     }
 }
