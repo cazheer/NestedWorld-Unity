@@ -18,12 +18,14 @@ public class ServerListener : MonoBehaviour
 
     UserData userData;
 
-    public ServeurMessageList serverMsg = new ServeurMessageList();
-    public ClientMessageList clientMsg = new ClientMessageList();
+    public ServeurMessageList serverMsg;
+    public ClientMessageList clientMsg;
 
     void Start()
     {
         userData = gameObject.GetComponent<UserData>();
+        clientMsg = new ClientMessageList(this);
+        serverMsg = new ServeurMessageList();
     }
 
     void Update()

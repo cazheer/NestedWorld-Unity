@@ -3,6 +3,7 @@ using MessagePack.Exception;
 using MessagePack.Serveur;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MessagePack.Client
 {
@@ -14,9 +15,10 @@ namespace MessagePack.Client
 
         private bool offline;
 
-        public ServerListener serverListener { get; set; }
-        public ClientMessageList(bool Offline = false)
+        public ServerListener serverListener;
+        public ClientMessageList(ServerListener l, bool Offline = false)
         {
+            serverListener = l;
             offline = Offline;
             map = new Dictionary<string, RequestBase>();
             answerDictionary = new Dictionary<string, AnswerBase>();

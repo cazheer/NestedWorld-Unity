@@ -52,6 +52,8 @@ public class CombatPopup : MonoBehaviour
 
     public void Decline()
     {
-        // TODO: create available response
+        var request = new MessagePack.Client.Answers.Combat.AvailableAnswer();
+        request.accept = false;
+        server.clientMsg.SendRequest(request);
     }
 }

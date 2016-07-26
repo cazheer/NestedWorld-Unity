@@ -137,7 +137,15 @@ public class ChooseMonsterMenu : MonoBehaviour
 
         if (count > 0)
         {
-            // TODO response to combat available
+            var request = new MessagePack.Client.Answers.Combat.AvailableAnswer();
+            request.accept = true;
+            for (int i = 0; i < 4; ++i)
+            {
+                if (choosenMonsters[i] != null)
+                    request.monsters[i] = choosenMonsters[i].id;
+            }
+            server.clientMsg.SendRequest(request);
+
         }
         else
             Logger.Instance.Log("You have to choose at least one monster before proceeding.");
@@ -147,7 +155,9 @@ public class ChooseMonsterMenu : MonoBehaviour
     {
         // TODO check
 
-        // TODO response to combat available
+        var request = new MessagePack.Client.Answers.Combat.AvailableAnswer();
+        request.accept = false;
+        server.clientMsg.SendRequest(request);
 
         GameObject.FindGameObjectWithTag("MenuContainer").transform.FindChild("HomeMenu").gameObject.SetActive(true);
         UnityEngine.SceneManagement.SceneManager.UnloadScene("GameScene");

@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using SimpleJSON;
+using UnityEngine.UI;
 
 public class HomeMenu : MonoBehaviour
 {
     UserData userData;
     HttpRequest request;
+    ServerListener server;
+
+    [SerializeField]
+    Text text;
 
     void Awake()
     {
@@ -19,6 +24,7 @@ public class HomeMenu : MonoBehaviour
         GameObject requester = GameObject.FindGameObjectWithTag("Requester");
         userData = requester.GetComponent<UserData>();
         request = requester.GetComponent<HttpRequest>();
+        server = requester.GetComponent<ServerListener>();
 
         UpdateUserInfo();
 	}
@@ -39,7 +45,14 @@ public class HomeMenu : MonoBehaviour
 
     public void SeekOpponent()
     {
-        // TODO "combat:ask"
+        if (text.text.Length != 0)
+        {
+            var request = new MessagePack.Client.Combat.Ask();
+            request.opponent = text.text;
+            server.clientMsg.SendRequest(request);
+        }
+        else
+            Logger.Instance.Log("Please insert an opponent name.");
     }
 
     public void User()
