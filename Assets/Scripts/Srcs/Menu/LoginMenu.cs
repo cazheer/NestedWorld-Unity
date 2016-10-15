@@ -62,8 +62,6 @@ public class LoginMenu : MonoBehaviour
             PlayerPrefs.SetString(Constants.passwordCache, password.text);
             PlayerPrefs.Save();
         }
-        
-        server.setupSocket();
 
         string sessionToken = node["token"].Value;
         if (sessionToken == null)
@@ -72,6 +70,8 @@ public class LoginMenu : MonoBehaviour
             return false;
         }
         userData.token = sessionToken;
+
+        server.setupSocket();
         SceneManager.LoadScene("HomeScene");
         return true;
     }

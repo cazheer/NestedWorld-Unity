@@ -50,6 +50,7 @@ public class HomeMenu : MonoBehaviour
             var request = new MessagePack.Client.Combat.Ask();
             request.opponent = text.text;
             server.clientMsg.SendRequest(request);
+            Logger.Instance.Log("Please wait.");
         }
         else
             Logger.Instance.Log("Please insert an opponent name.");

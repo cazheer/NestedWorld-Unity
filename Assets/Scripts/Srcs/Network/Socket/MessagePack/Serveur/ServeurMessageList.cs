@@ -1,5 +1,6 @@
 ﻿using Network.MessagePack;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace MessagePack.Serveur
@@ -46,9 +47,10 @@ namespace MessagePack.Serveur
 
         public void SelectMessage(byte[] obj)
         {
-            if (obj.Length == 0)
+            if (obj == null || obj.Length == 0)
                 return;
-
+            
+            Logger.Instance.Log("Obj received: " + obj);
             using (MemoryStream ms = new MemoryStream(obj))
             {
                 try

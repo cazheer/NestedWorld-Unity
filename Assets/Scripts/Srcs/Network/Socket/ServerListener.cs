@@ -60,6 +60,7 @@ public class ServerListener : MonoBehaviour
             return;
         StreamReader reader = new StreamReader(stream);
         string text = reader.ReadToEnd();
+        Debug.Log("Streamer write: \" " + text + " \"");
         theWriter.Write(text);
         theWriter.Flush();
     }
